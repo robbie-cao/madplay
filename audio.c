@@ -209,7 +209,7 @@ void clip(mad_fixed_t *sample, struct audio_stats *stats)
 # if defined(_MSC_VER)
 extern  /* needed to satisfy bizarre MSVC++ interaction with inline */
 # endif
-    inline
+inline
 signed long audio_linear_round(unsigned int bits, mad_fixed_t sample,
         struct audio_stats *stats)
 {
@@ -240,7 +240,7 @@ unsigned long prng(unsigned long state)
 # if defined(_MSC_VER)
 extern  /* needed to satisfy bizarre MSVC++ interaction with inline */
 # endif
-    inline
+inline
 signed long audio_linear_dither(unsigned int bits, mad_fixed_t sample,
         struct audio_dither *dither,
         struct audio_stats *stats)
@@ -1025,7 +1025,7 @@ mad_fixed_t mulaw2linear(unsigned char mulaw)
  * NAME:	audio_mulaw_round()
  * DESCRIPTION:	convert a linear PCM value to 8-bit ISDN mu-law
  */
-    inline
+inline
 unsigned char audio_mulaw_round(mad_fixed_t sample, struct audio_stats *stats)
 {
     clip(&sample, stats);
@@ -1037,7 +1037,7 @@ unsigned char audio_mulaw_round(mad_fixed_t sample, struct audio_stats *stats)
  * NAME:	audio_mulaw_dither()
  * DESCRIPTION:	convert a linear PCM value to dithered 8-bit ISDN mu-law
  */
-    inline
+inline
 unsigned char audio_mulaw_dither(mad_fixed_t sample,
         struct audio_dither *dither,
         struct audio_stats *stats)
