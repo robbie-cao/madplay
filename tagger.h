@@ -23,12 +23,12 @@
 # define TAGGER_H
 
 enum tagger_mode {
-  TAGGER_MODE_DISPLAY,
-  TAGGER_MODE_MODIFY
+    TAGGER_MODE_DISPLAY,
+    TAGGER_MODE_MODIFY
 };
 
 struct tagger {
-  enum tagger_mode mode;
+    enum tagger_mode mode;
 };
 
 void tagger_init(struct tagger *);

@@ -64,56 +64,56 @@ char const madplay_build[] = ""
 
 void ver_banner(FILE *stream)
 {
-  fprintf(stream, "%s %s - %s %s %s et al.\n", _("MPEG Audio Decoder"),
-	  MADPLAY_VERSION,
-	  _("Copyright (C)"), MADPLAY_PUBLISHYEAR, MADPLAY_AUTHOR);
+    fprintf(stream, "%s %s - %s %s %s et al.\n", _("MPEG Audio Decoder"),
+            MADPLAY_VERSION,
+            _("Copyright (C)"), MADPLAY_PUBLISHYEAR, MADPLAY_AUTHOR);
 
-  fflush(stream);
+    fflush(stream);
 }
 
 void copyright(FILE *stream, char const *str)
 {
-  if (strstr(str, COPYRIGHT) == str)
-    fprintf(stream, "  %s%s\n", _(COPYRIGHT), &str[sizeof(COPYRIGHT) - 1]);
-  else
-    fprintf(stream, "  %s\n", str);
+    if (strstr(str, COPYRIGHT) == str)
+        fprintf(stream, "  %s%s\n", _(COPYRIGHT), &str[sizeof(COPYRIGHT) - 1]);
+    else
+        fprintf(stream, "  %s\n", str);
 }
 
 void ver_version(FILE *stream)
 {
-  fprintf(stream, "%s\n", mad_version);
-  copyright(stream, mad_copyright);
-  fprintf(stream, "  %s: %s\n\n", _("Build options"), mad_build);
+    fprintf(stream, "%s\n", mad_version);
+    copyright(stream, mad_copyright);
+    fprintf(stream, "  %s: %s\n\n", _("Build options"), mad_build);
 
-  fprintf(stream, "%s\n", id3_version);
-  copyright(stream, id3_copyright);
-  fprintf(stream, "  %s: %s\n\n", _("Build options"), id3_build);
+    fprintf(stream, "%s\n", id3_version);
+    copyright(stream, id3_copyright);
+    fprintf(stream, "  %s: %s\n\n", _("Build options"), id3_build);
 
-  fprintf(stream, "%s\n", madplay_version);
-  copyright(stream, madplay_copyright);
-  fprintf(stream, "  %s: %s\n\n", _("Build options"), madplay_build);
+    fprintf(stream, "%s\n", madplay_version);
+    copyright(stream, madplay_copyright);
+    fprintf(stream, "  %s: %s\n\n", _("Build options"), madplay_build);
 }
 
 void ver_license(FILE *stream)
 {
-  fputc('\n', stream);
-  fprintf(stream,
-  _("This program is free software; you can redistribute it and/or modify it\n"
-    "under the terms of the GNU General Public License as published by the\n"
-    "Free Software Foundation; either version 2 of the License, or (at your\n"
-    "option) any later version.\n\n"
+    fputc('\n', stream);
+    fprintf(stream,
+            _("This program is free software; you can redistribute it and/or modify it\n"
+              "under the terms of the GNU General Public License as published by the\n"
+              "Free Software Foundation; either version 2 of the License, or (at your\n"
+              "option) any later version.\n\n"
 
-    "This program is distributed in the hope that it will be useful, but\n"
-    "WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
-    "General Public License for more details.\n\n"
+              "This program is distributed in the hope that it will be useful, but\n"
+              "WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+              "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
+              "General Public License for more details.\n\n"
 
-    "You should have received a copy of the GNU General Public License along\n"
-    "with this program; if not, write to the Free Software Foundation, Inc.,\n"
-    "59 Temple Place, Suite 330, Boston, MA 02111-1307 USA\n\n"
+              "You should have received a copy of the GNU General Public License along\n"
+              "with this program; if not, write to the Free Software Foundation, Inc.,\n"
+              "59 Temple Place, Suite 330, Boston, MA 02111-1307 USA\n\n"
 
-    "Some portions of this program may be licensable under different terms.\n"
-    "To inquire about alternate licensing, contact: %s\n"), madplay_author);
+              "Some portions of this program may be licensable under different terms.\n"
+              "To inquire about alternate licensing, contact: %s\n"), madplay_author);
 
-  fputc('\n', stream);
+    fputc('\n', stream);
 }

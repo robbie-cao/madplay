@@ -33,13 +33,13 @@
  */
 int strcasecmp(char const *str1, char const *str2)
 {
-  signed int c1, c2;
+    signed int c1, c2;
 
-  do {
-    c1 = tolower(*str1++);
-    c2 = tolower(*str2++);
-  }
-  while (c1 && c1 == c2);
+    do {
+        c1 = tolower(*str1++);
+        c2 = tolower(*str2++);
+    }
+    while (c1 && c1 == c2);
 
-  return c1 - c2;
+    return c1 - c2;
 }

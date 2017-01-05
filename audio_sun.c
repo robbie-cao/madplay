@@ -63,216 +63,216 @@ static audio_pcmfunc_t *audio_pcm;
 static
 int init(struct audio_init *init)
 {
-  if (init->path == 0)
-    init->path = getenv("AUDIODEV");
+    if (init->path == 0)
+        init->path = getenv("AUDIODEV");
 
-  if (init->path == 0)
-    init->path = AUDIO_DEVICE;
+    if (init->path == 0)
+        init->path = AUDIO_DEVICE;
 
-  sfd = open(init->path, O_WRONLY);
-  if (sfd == -1) {
-    audio_error = ":";
-    return -1;
-  }
+    sfd = open(init->path, O_WRONLY);
+    if (sfd == -1) {
+        audio_error = ":";
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }
 
 static
 int set_pause(int flag)
 {
-  static int paused;
-  audio_info_t info;
+    static int paused;
+    audio_info_t info;
 
-  if (flag != paused) {
-    paused = 0;
+    if (flag != paused) {
+        paused = 0;
 
-    AUDIO_INITINFO(&info);
-    info.play.pause = flag;
+        AUDIO_INITINFO(&info);
+        info.play.pause = flag;
 
-    if (ioctl(sfd, AUDIO_SETINFO, &info) == -1) {
-      audio_error = ":ioctl(AUDIO_SETINFO)";
-      return -1;
+        if (ioctl(sfd, AUDIO_SETINFO, &info) == -1) {
+            audio_error = ":ioctl(AUDIO_SETINFO)";
+            return -1;
+        }
+
+        paused = flag;
     }
 
-    paused = flag;
-  }
-
-  return 0;
+    return 0;
 }
 
 static
 int config(struct audio_config *config)
 {
-  unsigned int bitdepth;
-  audio_info_t info;
+    unsigned int bitdepth;
+    audio_info_t info;
 
-  bitdepth = config->precision & ~7;
-  if (bitdepth == 0)
-    bitdepth = 16;
-  else if (bitdepth > 32)
-    bitdepth = 32;
+    bitdepth = config->precision & ~7;
+    if (bitdepth == 0)
+        bitdepth = 16;
+    else if (bitdepth > 32)
+        bitdepth = 32;
 
-  set_pause(0);
+    set_pause(0);
 
-  if (ioctl(sfd, AUDIO_DRAIN, 0) == -1) {
-    audio_error = ":ioctl(AUDIO_DRAIN)";
-    return -1;
-  }
+    if (ioctl(sfd, AUDIO_DRAIN, 0) == -1) {
+        audio_error = ":ioctl(AUDIO_DRAIN)";
+        return -1;
+    }
 
-  AUDIO_INITINFO(&info);
+    AUDIO_INITINFO(&info);
 
-  info.play.sample_rate = config->speed;
-  info.play.channels    = config->channels;
-  info.play.precision   = bitdepth;
-  info.play.encoding    = AUDIO_ENCODING_LINEAR;
+    info.play.sample_rate = config->speed;
+    info.play.channels    = config->channels;
+    info.play.precision   = bitdepth;
+    info.play.encoding    = AUDIO_ENCODING_LINEAR;
 
-  if (ioctl(sfd, AUDIO_SETINFO, &info) == -1) {
-    audio_error = ":ioctl(AUDIO_SETINFO)";
-    return -1;
-  }
+    if (ioctl(sfd, AUDIO_SETINFO, &info) == -1) {
+        audio_error = ":ioctl(AUDIO_SETINFO)";
+        return -1;
+    }
 
-  /* validate settings */
+    /* validate settings */
 
-  if (ioctl(sfd, AUDIO_GETINFO, &info) == -1) {
-    audio_error = ":ioctl(AUDIO_GETINFO)";
-    return -1;
-  }
+    if (ioctl(sfd, AUDIO_GETINFO, &info) == -1) {
+        audio_error = ":ioctl(AUDIO_GETINFO)";
+        return -1;
+    }
 
-  config->channels  = info.play.channels;
-  config->speed     = info.play.sample_rate;
-  bitdepth          = info.play.precision;
+    config->channels  = info.play.channels;
+    config->speed     = info.play.sample_rate;
+    bitdepth          = info.play.precision;
 
-  switch (bitdepth) {
-  case 8:
-    audio_pcm = audio_pcm_u8;
-    break;
+    switch (bitdepth) {
+        case 8:
+            audio_pcm = audio_pcm_u8;
+            break;
 
-  case 16:
-    audio_pcm = audio_pcm_s16;
-    break;
+        case 16:
+            audio_pcm = audio_pcm_s16;
+            break;
 
-  case 24:
-    audio_pcm = audio_pcm_s24;
-    break;
+        case 24:
+            audio_pcm = audio_pcm_s24;
+            break;
 
-  case 32:
-    audio_pcm = audio_pcm_s32;
-    break;
+        case 32:
+            audio_pcm = audio_pcm_s32;
+            break;
 
-  default:
-    audio_error = _("unsupported bit depth");
-    return -1;
-  }
+        default:
+            audio_error = _("unsupported bit depth");
+            return -1;
+    }
 
-  config->precision = bitdepth;
+    config->precision = bitdepth;
 
-  return 0;
+    return 0;
 }
 
 static
 int output(unsigned char const *ptr, unsigned int len)
 {
-  while (len) {
-    int wrote;
+    while (len) {
+        int wrote;
 
-    wrote = write(sfd, ptr, len);
-    if (wrote == -1) {
-      if (errno == EINTR)
-	continue;
-      else {
-	audio_error = ":write";
-	return -1;
-      }
+        wrote = write(sfd, ptr, len);
+        if (wrote == -1) {
+            if (errno == EINTR)
+                continue;
+            else {
+                audio_error = ":write";
+                return -1;
+            }
+        }
+
+        ptr += wrote;
+        len -= wrote;
     }
 
-    ptr += wrote;
-    len -= wrote;
-  }
-
-  return 0;
+    return 0;
 }
 
 static
 int play(struct audio_play *play)
 {
-  unsigned char data[MAX_NSAMPLES * 4 * 2];
-  unsigned int len;
+    unsigned char data[MAX_NSAMPLES * 4 * 2];
+    unsigned int len;
 
-  set_pause(0);
+    set_pause(0);
 
-  len = audio_pcm(data, play->nsamples, play->samples[0], play->samples[1],
-		  play->mode, play->stats);
+    len = audio_pcm(data, play->nsamples, play->samples[0], play->samples[1],
+            play->mode, play->stats);
 
-  return output(data, len);
+    return output(data, len);
 }
 
 static
 int flush(void)
 {
 # if defined(I_FLUSH)
-  if (ioctl(sfd, I_FLUSH, FLUSHW) == -1) {
-    audio_error = ":ioctl(I_FLUSH)";
-    return -1;
-  }
+    if (ioctl(sfd, I_FLUSH, FLUSHW) == -1) {
+        audio_error = ":ioctl(I_FLUSH)";
+        return -1;
+    }
 # elif defined(AUDIO_FLUSH)
-  if (ioctl(sfd, AUDIO_FLUSH) == -1) {
-    audio_error = ":ioctl(AUDIO_FLUSH)";
-    return -1;
-  }
+    if (ioctl(sfd, AUDIO_FLUSH) == -1) {
+        audio_error = ":ioctl(AUDIO_FLUSH)";
+        return -1;
+    }
 # endif
 
-  return 0;
+    return 0;
 }
 
 static
 int stop(struct audio_stop *stop)
 {
-  int result;
+    int result;
 
-  result = set_pause(1);
+    result = set_pause(1);
 
-  if (result == 0 && stop->flush && flush() == -1)
-    result = -1;
+    if (result == 0 && stop->flush && flush() == -1)
+        result = -1;
 
-  return result;
+    return result;
 }
 
 static
 int finish(struct audio_finish *finish)
 {
-  int result;
+    int result;
 
-  result = set_pause(0);
+    result = set_pause(0);
 
-  if (close(sfd) == -1 && result == 0) {
-    audio_error = ":close";
-    result = -1;
-  }
+    if (close(sfd) == -1 && result == 0) {
+        audio_error = ":close";
+        result = -1;
+    }
 
-  return result;
+    return result;
 }
 
 int audio_sun(union audio_control *control)
 {
-  audio_error = 0;
+    audio_error = 0;
 
-  switch (control->command) {
-  case AUDIO_COMMAND_INIT:
-    return init(&control->init);
+    switch (control->command) {
+        case AUDIO_COMMAND_INIT:
+            return init(&control->init);
 
-  case AUDIO_COMMAND_CONFIG:
-    return config(&control->config);
+        case AUDIO_COMMAND_CONFIG:
+            return config(&control->config);
 
-  case AUDIO_COMMAND_PLAY:
-    return play(&control->play);
+        case AUDIO_COMMAND_PLAY:
+            return play(&control->play);
 
-  case AUDIO_COMMAND_STOP:
-    return stop(&control->stop);
+        case AUDIO_COMMAND_STOP:
+            return stop(&control->stop);
 
-  case AUDIO_COMMAND_FINISH:
-    return finish(&control->finish);
-  }
+        case AUDIO_COMMAND_FINISH:
+            return finish(&control->finish);
+    }
 
-  return 0;
+    return 0;
 }

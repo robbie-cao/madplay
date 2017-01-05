@@ -33,15 +33,15 @@
  */
 int strncasecmp(char const *str1, char const *str2, unsigned long len)
 {
-  signed int c1 = 0, c2 = 0;
+    signed int c1 = 0, c2 = 0;
 
-  while (len--) {
-    c1 = tolower(*str1++);
-    c2 = tolower(*str2++);
+    while (len--) {
+        c1 = tolower(*str1++);
+        c2 = tolower(*str2++);
 
-    if (c1 == 0 || c1 != c2)
-      break;
-  }
+        if (c1 == 0 || c1 != c2)
+            break;
+    }
 
-  return c1 - c2;
+    return c1 - c2;
 }

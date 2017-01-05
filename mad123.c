@@ -68,14 +68,14 @@ See the manpage mpg123(1) or call mpg123 with --longhelp for more information.
 usage: mpg123 [option(s)] [file(s) | URL(s) | -]
 supported options:
 
- -k <n> --skip <n>         
- -a <f> --audiodevice <f>  
+ -k <n> --skip <n>
+ -a <f> --audiodevice <f>
  -2     --2to1             2:1 Downsampling
  -4     --4to1             4:1 Downsampling
- -t     --test             
- -s     --stdout           
+ -t     --test
+ -s     --stdout
  -S     --STDOUT           Play AND output stream (not implemented yet)
- -c     --check            
+ -c     --check
  -v[*]  --verbose          Increase verboselevel
  -q     --quiet            Enables quiet mode
  -y     --resync           DISABLES resync on error
@@ -105,97 +105,97 @@ supported options:
  -w <f> --wav <f>          Writes samples as WAV file in <f> (- is stdout)
         --au <f>           Writes samples as Sun AU file in <f> (- is stdout)
         --cdr <f>          Writes samples as CDR file in <f> (- is stdout)
- -E <s> --esd <s>          Plays to  ESD server <s> 
+ -E <s> --esd <s>          Plays to  ESD server <s>
 
 See the manpage mpg123(1) for more information.
 */
 
 static
 struct option const options[] = {
-  { "skip",        required_argument, 0,  'k' },
-  { "audiodevice", required_argument, 0,  'a' },
-  { "2to1",        no_argument,       0,  '2' },
-  { "4to1",        no_argument,       0,  '4' },
-  { "test",        no_argument,       0,  't' },
-  { "stdout",      no_argument,       0,  's' },
-  { "STDOUT",      no_argument,       0,  'S' },
-  { "check",       no_argument,       0,  'c' },
-  { "verbose",     no_argument,       0,  'v' },
-  { "quiet",       no_argument,       0,  'q' },
-  { "resync",      no_argument,       0,  'y' },
-  { "left",        no_argument,       0,  '0' },
-  { "single0",     no_argument,       0,  '0' },
-  { "right",       no_argument,       0,  '1' },
-  { "single1",     no_argument,       0,  '1' },
-  { "mono",        no_argument,       0,  'm' },
-  { "mix",         no_argument,       0,  'm' },
-  { "stereo",      no_argument,       0, -'s' },
-  { "reopen",      no_argument,       0, -'r' },
-  { "gain",        required_argument, 0,  'g' },
-  { "rate",        required_argument, 0,  'r' },
-  { "8bit",        no_argument,       0, -'8' },
-  { "headphones",  no_argument,       0,  'o' },
-  { "speaker",     no_argument,       0,  'o' },
-  { "lineout",     no_argument,       0,  'o' },
-  { "scale",       required_argument, 0,  'f' },
-  { "frames",      required_argument, 0,  'n' },
-  { "buffer",      required_argument, 0,  'b' },
-  { "doublespeed", required_argument, 0,  'd' },
-  { "halfspeed",   required_argument, 0,  'h' },
-  { "proxy",       required_argument, 0,  'p' },
-  { "list",        required_argument, 0,  '@' },
-  { "shuffle",     no_argument,       0,  'z' },
-  { "random",      no_argument,       0,  'Z' },
-  { "equalizer",   required_argument, 0,  'E' },
-  { "aggressive",  no_argument,       0, -'a' },
-  { "auth",        required_argument, 0,  'u' },
-  { "wav",         required_argument, 0,  'w' },
-  { "au",          required_argument, 0, -'m' },
-  { "cdr",         required_argument, 0, -'c' },
-  { "esd",         required_argument, 0, -'e' },
-  { 0 }
+    { "skip",        required_argument, 0,  'k' },
+    { "audiodevice", required_argument, 0,  'a' },
+    { "2to1",        no_argument,       0,  '2' },
+    { "4to1",        no_argument,       0,  '4' },
+    { "test",        no_argument,       0,  't' },
+    { "stdout",      no_argument,       0,  's' },
+    { "STDOUT",      no_argument,       0,  'S' },
+    { "check",       no_argument,       0,  'c' },
+    { "verbose",     no_argument,       0,  'v' },
+    { "quiet",       no_argument,       0,  'q' },
+    { "resync",      no_argument,       0,  'y' },
+    { "left",        no_argument,       0,  '0' },
+    { "single0",     no_argument,       0,  '0' },
+    { "right",       no_argument,       0,  '1' },
+    { "single1",     no_argument,       0,  '1' },
+    { "mono",        no_argument,       0,  'm' },
+    { "mix",         no_argument,       0,  'm' },
+    { "stereo",      no_argument,       0, -'s' },
+    { "reopen",      no_argument,       0, -'r' },
+    { "gain",        required_argument, 0,  'g' },
+    { "rate",        required_argument, 0,  'r' },
+    { "8bit",        no_argument,       0, -'8' },
+    { "headphones",  no_argument,       0,  'o' },
+    { "speaker",     no_argument,       0,  'o' },
+    { "lineout",     no_argument,       0,  'o' },
+    { "scale",       required_argument, 0,  'f' },
+    { "frames",      required_argument, 0,  'n' },
+    { "buffer",      required_argument, 0,  'b' },
+    { "doublespeed", required_argument, 0,  'd' },
+    { "halfspeed",   required_argument, 0,  'h' },
+    { "proxy",       required_argument, 0,  'p' },
+    { "list",        required_argument, 0,  '@' },
+    { "shuffle",     no_argument,       0,  'z' },
+    { "random",      no_argument,       0,  'Z' },
+    { "equalizer",   required_argument, 0,  'E' },
+    { "aggressive",  no_argument,       0, -'a' },
+    { "auth",        required_argument, 0,  'u' },
+    { "wav",         required_argument, 0,  'w' },
+    { "au",          required_argument, 0, -'m' },
+    { "cdr",         required_argument, 0, -'c' },
+    { "esd",         required_argument, 0, -'e' },
+    { 0 }
 };
 
 static
 struct {
-  int verbosity;
+    int verbosity;
 } config = {
-  0	/* verbosity */
+    0	/* verbosity */
 };
 
 int main(int argc, char *argv[])
 {
-  int opt, index;
+    int opt, index;
 
-  while ((opt = getopt_long(argc, argv,
-			    "vqtsSw:k:n:cyb:f:r:g:o:a:24d:h:01mp:@:zZu:E:C",
-			    options, &index)) != -1) {
-    switch (opt) {
-    case 'v':
-      ++config.verbosity;
-      break;
+    while ((opt = getopt_long(argc, argv,
+                    "vqtsSw:k:n:cyb:f:r:g:o:a:24d:h:01mp:@:zZu:E:C",
+                    options, &index)) != -1) {
+        switch (opt) {
+            case 'v':
+                ++config.verbosity;
+                break;
 
-    case 'q':
-      config.verbosity = -1;
-      break;
+            case 'q':
+                config.verbosity = -1;
+                break;
 
-    case '?':
-      exit(1);
+            case '?':
+                exit(1);
+        }
     }
-  }
 
-  if (config.verbosity >= 0) {
-    fprintf(stderr,
-	    "High Quality MPEG 1.0/2.0/2.5 Audio Player"
-	    " for Layer I, II, and III.\n"
-	    "Version 0.59r (2000/Oct/04)."
-	    " Written and copyright by Robert Leslie.\n"
-	    "Uses mpg123 command interface. See the documentation!\n"
-	    "THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY!"
-	    " USE AT YOUR OWN RISK!\n");
-  }
+    if (config.verbosity >= 0) {
+        fprintf(stderr,
+                "High Quality MPEG 1.0/2.0/2.5 Audio Player"
+                " for Layer I, II, and III.\n"
+                "Version 0.59r (2000/Oct/04)."
+                " Written and copyright by Robert Leslie.\n"
+                "Uses mpg123 command interface. See the documentation!\n"
+                "THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY!"
+                " USE AT YOUR OWN RISK!\n");
+    }
 
-  /* ... */
+    /* ... */
 
-  return 0;
+    return 0;
 }

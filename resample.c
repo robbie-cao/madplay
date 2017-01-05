@@ -36,23 +36,23 @@
  * DESCRIPTION:	initialize resampling state
  */
 int resample_init(struct resample_state *state,
-		  unsigned int oldrate, unsigned int newrate)
+        unsigned int oldrate, unsigned int newrate)
 {
-  mad_fixed_t ratio;
+    mad_fixed_t ratio;
 
-  if (newrate == 0)
-    return -1;
+    if (newrate == 0)
+        return -1;
 
-  ratio = mad_f_div(oldrate, newrate);
-  if (ratio <= 0 || ratio > MAX_RESAMPLEFACTOR * MAD_F_ONE)
-    return -1;
+    ratio = mad_f_div(oldrate, newrate);
+    if (ratio <= 0 || ratio > MAX_RESAMPLEFACTOR * MAD_F_ONE)
+        return -1;
 
-  state->ratio = ratio;
+    state->ratio = ratio;
 
-  state->step = 0;
-  state->last = 0;
+    state->step = 0;
+    state->last = 0;
 
-  return 0;
+    return 0;
 }
 
 /*
@@ -60,60 +60,60 @@ int resample_init(struct resample_state *state,
  * DESCRIPTION:	algorithmically change the sampling rate of a PCM sample block
  */
 unsigned int resample_block(struct resample_state *state,
-			    unsigned int nsamples, mad_fixed_t const *old,
-			    mad_fixed_t *new)
+        unsigned int nsamples, mad_fixed_t const *old,
+        mad_fixed_t *new)
 {
-  mad_fixed_t const *end, *begin;
+    mad_fixed_t const *end, *begin;
 
-  /*
-   * This resampling algorithm is based on a linear interpolation, which is
-   * not at all the best sounding but is relatively fast and efficient.
-   *
-   * A better algorithm would be one that implements a bandlimited
-   * interpolation.
-   */
+    /*
+     * This resampling algorithm is based on a linear interpolation, which is
+     * not at all the best sounding but is relatively fast and efficient.
+     *
+     * A better algorithm would be one that implements a bandlimited
+     * interpolation.
+     */
 
-  if (state->ratio == MAD_F_ONE) {
-    memcpy(new, old, nsamples * sizeof(mad_fixed_t));
-    return nsamples;
-  }
-
-  end   = old + nsamples;
-  begin = new;
-
-  if (state->step < 0) {
-    state->step = mad_f_fracpart(-state->step);
-
-    while (state->step < MAD_F_ONE) {
-      *new++ = state->step ?
-	state->last + mad_f_mul(*old - state->last, state->step) : state->last;
-
-      state->step += state->ratio;
-      if (((state->step + 0x00000080L) & 0x0fffff00L) == 0)
-	state->step = (state->step + 0x00000080L) & ~0x0fffffffL;
+    if (state->ratio == MAD_F_ONE) {
+        memcpy(new, old, nsamples * sizeof(mad_fixed_t));
+        return nsamples;
     }
 
-    state->step -= MAD_F_ONE;
-  }
+    end   = old + nsamples;
+    begin = new;
 
-  while (end - old > 1 + mad_f_intpart(state->step)) {
-    old        += mad_f_intpart(state->step);
-    state->step = mad_f_fracpart(state->step);
+    if (state->step < 0) {
+        state->step = mad_f_fracpart(-state->step);
 
-    *new++ = state->step ?
-      *old + mad_f_mul(old[1] - old[0], state->step) : *old;
+        while (state->step < MAD_F_ONE) {
+            *new++ = state->step ?
+                state->last + mad_f_mul(*old - state->last, state->step) : state->last;
 
-    state->step += state->ratio;
-    if (((state->step + 0x00000080L) & 0x0fffff00L) == 0)
-      state->step = (state->step + 0x00000080L) & ~0x0fffffffL;
-  }
+            state->step += state->ratio;
+            if (((state->step + 0x00000080L) & 0x0fffff00L) == 0)
+                state->step = (state->step + 0x00000080L) & ~0x0fffffffL;
+        }
 
-  if (end - old == 1 + mad_f_intpart(state->step)) {
-    state->last = end[-1];
-    state->step = -state->step;
-  }
-  else
-    state->step -= mad_f_fromint(end - old);
+        state->step -= MAD_F_ONE;
+    }
 
-  return new - begin;
+    while (end - old > 1 + mad_f_intpart(state->step)) {
+        old        += mad_f_intpart(state->step);
+        state->step = mad_f_fracpart(state->step);
+
+        *new++ = state->step ?
+            *old + mad_f_mul(old[1] - old[0], state->step) : *old;
+
+        state->step += state->ratio;
+        if (((state->step + 0x00000080L) & 0x0fffff00L) == 0)
+            state->step = (state->step + 0x00000080L) & ~0x0fffffffL;
+    }
+
+    if (end - old == 1 + mad_f_intpart(state->step)) {
+        state->last = end[-1];
+        state->step = -state->step;
+    }
+    else
+        state->step -= mad_f_fromint(end - old);
+
+    return new - begin;
 }

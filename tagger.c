@@ -32,7 +32,7 @@
 
 void tagger_init(struct tagger *tagger)
 {
-  tagger->mode = TAGGER_MODE_DISPLAY;
+    tagger->mode = TAGGER_MODE_DISPLAY;
 }
 
 void tagger_finish(struct tagger *tagger)
@@ -42,33 +42,33 @@ void tagger_finish(struct tagger *tagger)
 static
 int tag_one(struct tagger *tagger, char const *path)
 {
-  struct id3_file *file;
+    struct id3_file *file;
 
-  file = id3_file_open(path, tagger->mode == TAGGER_MODE_MODIFY ?
-		       ID3_FILE_MODE_READWRITE : ID3_FILE_MODE_READONLY);
-  if (file == 0) {
-    perror(path);
-    return -1;
-  }
+    file = id3_file_open(path, tagger->mode == TAGGER_MODE_MODIFY ?
+            ID3_FILE_MODE_READWRITE : ID3_FILE_MODE_READONLY);
+    if (file == 0) {
+        perror(path);
+        return -1;
+    }
 
-  /* ... */
+    /* ... */
 
-  if (id3_file_close(file) == -1) {
-    perror(path);
-    return -1;
-  }
+    if (id3_file_close(file) == -1) {
+        perror(path);
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }
 
 int tagger_run(struct tagger *tagger, int argc, char const *argv[])
 {
-  int i, result = 0;
+    int i, result = 0;
 
-  for (i = 0; i < argc; ++i) {
-    if (tag_one(tagger, argv[i]) == -1)
-      result = -1;
-  }
+    for (i = 0; i < argc; ++i) {
+        if (tag_one(tagger, argv[i]) == -1)
+            result = -1;
+    }
 
-  return result;
+    return result;
 }

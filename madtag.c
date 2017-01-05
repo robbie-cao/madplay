@@ -44,9 +44,9 @@
 
 static
 struct option const options[] = {
-  { "help",		no_argument,		0,		 'h' },
-  { "version",		no_argument,		0,		 'V' },
-  { 0 }
+    { "help",		no_argument,		0,		 'h' },
+    { "version",		no_argument,		0,		 'V' },
+    { 0 }
 };
 
 char const *argv0;
@@ -60,22 +60,22 @@ char const *argv0;
 static
 void show_usage(int verbose)
 {
-  FILE *stream = verbose ? stdout : stderr;
+    FILE *stream = verbose ? stdout : stderr;
 
-  fprintf(stream, _("Usage: %s [OPTIONS] FILE [...]\n"), argv0);
+    fprintf(stream, _("Usage: %s [OPTIONS] FILE [...]\n"), argv0);
 
-  if (!verbose) {
-    fprintf(stream, _("Try `%s --help' for more information.\n"), argv0);
-    return;
-  }
+    if (!verbose) {
+        fprintf(stream, _("Try `%s --help' for more information.\n"), argv0);
+        return;
+    }
 
-  EPUTS(_("Display or modify ID3 tags in FILE(s).\n"));
+    EPUTS(_("Display or modify ID3 tags in FILE(s).\n"));
 
-  /* the following usage text should agree with the option names */
+    /* the following usage text should agree with the option names */
 
-  EPUTS(_("\nMiscellaneous:\n"));
-  EPUTS(_("  -V, --version                display version number and exit\n"));
-  EPUTS(_("  -h, --help                   display this help and exit\n"));
+    EPUTS(_("\nMiscellaneous:\n"));
+    EPUTS(_("  -V, --version                display version number and exit\n"));
+    EPUTS(_("  -h, --help                   display this help and exit\n"));
 }
 
 # undef EPUTS
@@ -87,69 +87,69 @@ void show_usage(int verbose)
 static
 void get_options(int argc, char *argv[], struct tagger *tagger)
 {
-  int opt, index;
+    int opt, index;
 
-  while ((opt = getopt_long(argc, argv,
-			    "Vh",	/* miscellaneous options */
-			    options, &index)) != -1) {
-    switch (opt) {
-    case 0:
-      break;
+    while ((opt = getopt_long(argc, argv,
+                    "Vh",	/* miscellaneous options */
+                    options, &index)) != -1) {
+        switch (opt) {
+            case 0:
+                break;
 
-    case 'h':
-      show_usage(1);
-      exit(0);
+            case 'h':
+                show_usage(1);
+                exit(0);
 
-    case 'V':
-      fprintf(stderr, "%s %s\n  %s %s %s\n",
-	      _("ID3 Tag Library"), ID3_VERSION,
-	      _("Copyright (C)"), ID3_PUBLISHYEAR, ID3_AUTHOR);
-      exit(0);
+            case 'V':
+                fprintf(stderr, "%s %s\n  %s %s %s\n",
+                        _("ID3 Tag Library"), ID3_VERSION,
+                        _("Copyright (C)"), ID3_PUBLISHYEAR, ID3_AUTHOR);
+                exit(0);
 
-    case '?':
-      show_usage(0);
-      exit(1);
+            case '?':
+                show_usage(0);
+                exit(1);
 
-    default:
-      assert(!"option handler");
+            default:
+                assert(!"option handler");
+        }
     }
-  }
 
-  if (optind == argc) {
-    show_usage(0);
-    exit(2);
-  }
+    if (optind == argc) {
+        show_usage(0);
+        exit(2);
+    }
 }
 
 int main(int argc, char *argv[])
 {
-  struct tagger tagger;
-  int result = 0;
+    struct tagger tagger;
+    int result = 0;
 
-  argv0 = argv[0];
+    argv0 = argv[0];
 
-  /* internationalization support */
+    /* internationalization support */
 
 # if defined(ENABLE_NLS)
-  setlocale(LC_ALL, "");
-  bindtextdomain(PACKAGE, LOCALEDIR);
-  textdomain(PACKAGE);
+    setlocale(LC_ALL, "");
+    bindtextdomain(PACKAGE, LOCALEDIR);
+    textdomain(PACKAGE);
 # endif
 
-  /* initialize and get options */
+    /* initialize and get options */
 
-  tagger_init(&tagger);
+    tagger_init(&tagger);
 
-  get_options(argc, argv, &tagger);
+    get_options(argc, argv, &tagger);
 
-  /* main processing */
+    /* main processing */
 
-  if (tagger_run(&tagger, argc - optind, (char const **) &argv[optind]) == -1)
-    result = 4;
+    if (tagger_run(&tagger, argc - optind, (char const **) &argv[optind]) == -1)
+        result = 4;
 
-  /* finish up */
+    /* finish up */
 
-  tagger_finish(&tagger);
+    tagger_finish(&tagger);
 
-  return result;
+    return result;
 }

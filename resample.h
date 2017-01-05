@@ -25,10 +25,10 @@
 # include <mad.h>
 
 struct resample_state {
-  mad_fixed_t ratio;
+    mad_fixed_t ratio;
 
-  mad_fixed_t step;
-  mad_fixed_t last;
+    mad_fixed_t step;
+    mad_fixed_t last;
 };
 
 int resample_init(struct resample_state *, unsigned int, unsigned int);
@@ -36,6 +36,6 @@ int resample_init(struct resample_state *, unsigned int, unsigned int);
 # define resample_finish(state)  /* nothing */
 
 unsigned int resample_block(struct resample_state *, unsigned int,
-			    mad_fixed_t const *, mad_fixed_t *);
+        mad_fixed_t const *, mad_fixed_t *);
 
 # endif

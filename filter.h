@@ -27,14 +27,14 @@
 typedef enum mad_flow filter_func_t(void *, struct mad_frame *);
 
 struct filter {
-  int flags;
-  filter_func_t *func;
-  void *data;
-  struct filter *chain;
+    int flags;
+    filter_func_t *func;
+    void *data;
+    struct filter *chain;
 };
 
 enum {
-  FILTER_FLAG_DMEM = 0x0001
+    FILTER_FLAG_DMEM = 0x0001
 };
 
 void filter_init(struct filter *, filter_func_t *, void *, struct filter *);

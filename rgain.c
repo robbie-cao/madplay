@@ -36,16 +36,16 @@
  */
 void rgain_parse(struct rgain *rgain, struct mad_bitptr *ptr)
 {
-  int negative;
+    int negative;
 
-  rgain->name       = mad_bit_read(ptr, 3);
-  rgain->originator = mad_bit_read(ptr, 3);
+    rgain->name       = mad_bit_read(ptr, 3);
+    rgain->originator = mad_bit_read(ptr, 3);
 
-  negative          = mad_bit_read(ptr, 1);
-  rgain->adjustment = mad_bit_read(ptr, 9);
+    negative          = mad_bit_read(ptr, 1);
+    rgain->adjustment = mad_bit_read(ptr, 9);
 
-  if (negative)
-    rgain->adjustment = -rgain->adjustment;
+    if (negative)
+        rgain->adjustment = -rgain->adjustment;
 }
 
 /*
@@ -54,21 +54,21 @@ void rgain_parse(struct rgain *rgain, struct mad_bitptr *ptr)
  */
 char const *rgain_originator(struct rgain const *rgain)
 {
-  char const *originator = 0;
+    char const *originator = 0;
 
-  switch (rgain->originator) {
-  case RGAIN_ORIGINATOR_UNSPECIFIED:
-    return 0;
-  case RGAIN_ORIGINATOR_PRESET:
-    originator = _("preset");
-    break;
-  case RGAIN_ORIGINATOR_USER:
-    originator = _("user");
-    break;
-  case RGAIN_ORIGINATOR_AUTOMATIC:
-    originator = _("automatic");
-    break;
-  }
+    switch (rgain->originator) {
+        case RGAIN_ORIGINATOR_UNSPECIFIED:
+            return 0;
+        case RGAIN_ORIGINATOR_PRESET:
+            originator = _("preset");
+            break;
+        case RGAIN_ORIGINATOR_USER:
+            originator = _("user");
+            break;
+        case RGAIN_ORIGINATOR_AUTOMATIC:
+            originator = _("automatic");
+            break;
+    }
 
-  return originator ? originator : _("other");
+    return originator ? originator : _("other");
 }

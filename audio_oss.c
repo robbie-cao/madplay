@@ -62,7 +62,7 @@
 
 # undef AUDIO_TRY32BITS
 # if (defined(AFMT_S32_LE) && AFMT_S32_NE == AFMT_S32_LE) ||  \
-     (defined(AFMT_S32_BE) && AFMT_S32_NE == AFMT_S32_BE)
+                                           (defined(AFMT_S32_BE) && AFMT_S32_NE == AFMT_S32_BE)
 #  define AUDIO_TRY32BITS
 # endif
 
@@ -83,236 +83,236 @@ static audio_pcmfunc_t *audio_pcm;
 static
 int init(struct audio_init *init)
 {
-  if (init->path)
-    sfd = open(init->path, O_WRONLY);
-  else {
-    sfd = open(init->path = AUDIO_DEVICE1, O_WRONLY);
-    if (sfd == -1)
-      sfd = open(init->path = AUDIO_DEVICE2, O_WRONLY);
-  }
+    if (init->path)
+        sfd = open(init->path, O_WRONLY);
+    else {
+        sfd = open(init->path = AUDIO_DEVICE1, O_WRONLY);
+        if (sfd == -1)
+            sfd = open(init->path = AUDIO_DEVICE2, O_WRONLY);
+    }
 
-  if (sfd == -1) {
-    audio_error = ":";
-    return -1;
-  }
+    if (sfd == -1) {
+        audio_error = ":";
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }
 
 static
 int config(struct audio_config *config)
 {
-  unsigned int bitdepth;
-  int format;
+    unsigned int bitdepth;
+    int format;
 
-  bitdepth = config->precision & ~7;
+    bitdepth = config->precision & ~7;
 # if defined(AUDIO_TRY32BITS)
-  if (bitdepth == 0 || bitdepth > 32)
-    bitdepth = 32;
+    if (bitdepth == 0 || bitdepth > 32)
+        bitdepth = 32;
 # else
-  if (bitdepth == 0 || bitdepth > 16)
-    bitdepth = 16;
+    if (bitdepth == 0 || bitdepth > 16)
+        bitdepth = 16;
 # endif
 
-  if (ioctl(sfd, SNDCTL_DSP_SYNC, 0) == -1) {
-    audio_error = ":ioctl(SNDCTL_DSP_SYNC)";
-    return -1;
-  }
-
-  switch (bitdepth) {
-  case 8:
-    format = AFMT_U8;
-    break;
-
-  case 16:
-    format = AFMT_S16_NE;
-    break;
-
-# if defined(AUDIO_TRY32BITS)
-  case 24:
-    bitdepth = 32;
-  case 32:
-    format = AFMT_S32_NE;
-    break;
-# endif
-  }
-
-  /* check supported formats */
-  {
-    int mask;
-
-    if (ioctl(sfd, SNDCTL_DSP_GETFMTS, &mask) != -1) {
-      while (!(mask & format) && format != AFMT_U8) {
-	switch (format) {
-# if defined(AUDIO_TRY32BITS)
-	case AFMT_S32_LE:
-	case AFMT_S32_BE:
-	  bitdepth = 16;
-	  format = AFMT_S16_NE;
-	  break;
-# endif
-
-	case AFMT_S16_LE:
-	case AFMT_S16_BE:
-	  bitdepth = 8;
-	  format = AFMT_U8;
-	  break;
-	}
-      }
+    if (ioctl(sfd, SNDCTL_DSP_SYNC, 0) == -1) {
+        audio_error = ":ioctl(SNDCTL_DSP_SYNC)";
+        return -1;
     }
-  }
 
-  while (ioctl(sfd, SNDCTL_DSP_SETFMT, &format) == -1) {
+    switch (bitdepth) {
+        case 8:
+            format = AFMT_U8;
+            break;
+
+        case 16:
+            format = AFMT_S16_NE;
+            break;
+
 # if defined(AUDIO_TRY32BITS)
-    /*
-     * Some audio drivers may return an error instead of indicating a
-     * supported format when 32-bit format is requested but not available.
-     */
-    if (bitdepth == 32) {
-      bitdepth = 16;
-      format = AFMT_S16_NE;
-      continue;
+        case 24:
+            bitdepth = 32;
+        case 32:
+            format = AFMT_S32_NE;
+            break;
+# endif
     }
+
+    /* check supported formats */
+    {
+        int mask;
+
+        if (ioctl(sfd, SNDCTL_DSP_GETFMTS, &mask) != -1) {
+            while (!(mask & format) && format != AFMT_U8) {
+                switch (format) {
+# if defined(AUDIO_TRY32BITS)
+                    case AFMT_S32_LE:
+                    case AFMT_S32_BE:
+                        bitdepth = 16;
+                        format = AFMT_S16_NE;
+                        break;
 # endif
 
-    audio_error = ":ioctl(SNDCTL_DSP_SETFMT)";
-    return -1;
-  }
+                    case AFMT_S16_LE:
+                    case AFMT_S16_BE:
+                        bitdepth = 8;
+                        format = AFMT_U8;
+                        break;
+                }
+            }
+        }
+    }
 
-  switch (format) {
+    while (ioctl(sfd, SNDCTL_DSP_SETFMT, &format) == -1) {
+# if defined(AUDIO_TRY32BITS)
+        /*
+         * Some audio drivers may return an error instead of indicating a
+         * supported format when 32-bit format is requested but not available.
+         */
+        if (bitdepth == 32) {
+            bitdepth = 16;
+            format = AFMT_S16_NE;
+            continue;
+        }
+# endif
+
+        audio_error = ":ioctl(SNDCTL_DSP_SETFMT)";
+        return -1;
+    }
+
+    switch (format) {
 # if defined(AFMT_S32_LE)
-  case AFMT_S32_LE:
-    audio_pcm = audio_pcm_s32le;
-    bitdepth  = 32;
-    break;
+        case AFMT_S32_LE:
+            audio_pcm = audio_pcm_s32le;
+            bitdepth  = 32;
+            break;
 # endif
 
 # if defined(AFMT_S32_BE)
-  case AFMT_S32_BE:
-    audio_pcm = audio_pcm_s32be;
-    bitdepth  = 32;
-    break;
+        case AFMT_S32_BE:
+            audio_pcm = audio_pcm_s32be;
+            bitdepth  = 32;
+            break;
 # endif
 
-  case AFMT_S16_LE:
-    audio_pcm = audio_pcm_s16le;
-    bitdepth  = 16;
-    break;
+        case AFMT_S16_LE:
+            audio_pcm = audio_pcm_s16le;
+            bitdepth  = 16;
+            break;
 
-  case AFMT_S16_BE:
-    audio_pcm = audio_pcm_s16be;
-    bitdepth  = 16;
-    break;
+        case AFMT_S16_BE:
+            audio_pcm = audio_pcm_s16be;
+            bitdepth  = 16;
+            break;
 
-  case AFMT_U8:
-    audio_pcm = audio_pcm_u8;
-    bitdepth  = 8;
-    break;
+        case AFMT_U8:
+            audio_pcm = audio_pcm_u8;
+            bitdepth  = 8;
+            break;
 
-  case AFMT_MU_LAW:
-    audio_pcm = audio_pcm_mulaw;
-    bitdepth  = 8;
-    break;
+        case AFMT_MU_LAW:
+            audio_pcm = audio_pcm_mulaw;
+            bitdepth  = 8;
+            break;
 
-  default:
-    audio_error = _("no supported audio format available");
-    return -1;
-  }
+        default:
+            audio_error = _("no supported audio format available");
+            return -1;
+    }
 
-  config->precision = bitdepth;
+    config->precision = bitdepth;
 
-  if (ioctl(sfd, SNDCTL_DSP_CHANNELS, &config->channels) == -1) {
-    audio_error = ":ioctl(SNDCTL_DSP_CHANNELS)";
-    return -1;
-  }
+    if (ioctl(sfd, SNDCTL_DSP_CHANNELS, &config->channels) == -1) {
+        audio_error = ":ioctl(SNDCTL_DSP_CHANNELS)";
+        return -1;
+    }
 
-  if (ioctl(sfd, SNDCTL_DSP_SPEED, &config->speed) == -1) {
-    audio_error = ":ioctl(SNDCTL_DSP_SPEED)";
-    return -1;
-  }
+    if (ioctl(sfd, SNDCTL_DSP_SPEED, &config->speed) == -1) {
+        audio_error = ":ioctl(SNDCTL_DSP_SPEED)";
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }
 
 static
 int output(unsigned char const *ptr, unsigned int len)
 {
-  while (len) {
-    int wrote;
+    while (len) {
+        int wrote;
 
-    wrote = write(sfd, ptr, len);
-    if (wrote == -1) {
-      if (errno == EINTR)
-	continue;
-      else {
-	audio_error = ":write";
-	return -1;
-      }
+        wrote = write(sfd, ptr, len);
+        if (wrote == -1) {
+            if (errno == EINTR)
+                continue;
+            else {
+                audio_error = ":write";
+                return -1;
+            }
+        }
+
+        ptr += wrote;
+        len -= wrote;
     }
 
-    ptr += wrote;
-    len -= wrote;
-  }
-
-  return 0;
+    return 0;
 }
 
 static
 int play(struct audio_play *play)
 {
-  unsigned char data[MAX_NSAMPLES * 4 * 2];
-  unsigned int len;
+    unsigned char data[MAX_NSAMPLES * 4 * 2];
+    unsigned int len;
 
-  len = audio_pcm(data, play->nsamples, play->samples[0], play->samples[1],
-		  play->mode, play->stats);
+    len = audio_pcm(data, play->nsamples, play->samples[0], play->samples[1],
+            play->mode, play->stats);
 
-  return output(data, len);
+    return output(data, len);
 }
 
 static
 int stop(struct audio_stop *stop)
 {
-  /* ignores stop->flush; no way to pause immediately without flushing? */
+    /* ignores stop->flush; no way to pause immediately without flushing? */
 
-  if (ioctl(sfd, SNDCTL_DSP_RESET, 0) == -1) {
-    audio_error = ":ioctl(SNDCTL_DSP_RESET)";
-    return -1;
-  }
+    if (ioctl(sfd, SNDCTL_DSP_RESET, 0) == -1) {
+        audio_error = ":ioctl(SNDCTL_DSP_RESET)";
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }
 
 static
 int finish(struct audio_finish *finish)
 {
-  if (close(sfd) == -1) {
-    audio_error = ":close";
-    return -1;
-  }
+    if (close(sfd) == -1) {
+        audio_error = ":close";
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }
 
 int audio_oss(union audio_control *control)
 {
-  audio_error = 0;
+    audio_error = 0;
 
-  switch (control->command) {
-  case AUDIO_COMMAND_INIT:
-    return init(&control->init);
+    switch (control->command) {
+        case AUDIO_COMMAND_INIT:
+            return init(&control->init);
 
-  case AUDIO_COMMAND_CONFIG:
-    return config(&control->config);
+        case AUDIO_COMMAND_CONFIG:
+            return config(&control->config);
 
-  case AUDIO_COMMAND_PLAY:
-    return play(&control->play);
+        case AUDIO_COMMAND_PLAY:
+            return play(&control->play);
 
-  case AUDIO_COMMAND_STOP:
-    return stop(&control->stop);
+        case AUDIO_COMMAND_STOP:
+            return stop(&control->stop);
 
-  case AUDIO_COMMAND_FINISH:
-    return finish(&control->finish);
-  }
+        case AUDIO_COMMAND_FINISH:
+            return finish(&control->finish);
+    }
 
-  return 0;
+    return 0;
 }

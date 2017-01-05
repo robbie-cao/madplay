@@ -44,119 +44,119 @@ unsigned int samplecount;
 static
 int init(struct audio_init *init)
 {
-  if (init->path && strcmp(init->path, "-") != 0) {
-    outfile = fopen(init->path, "wb");
-    if (outfile == 0) {
-      audio_error = ":";
-      return -1;
+    if (init->path && strcmp(init->path, "-") != 0) {
+        outfile = fopen(init->path, "wb");
+        if (outfile == 0) {
+            audio_error = ":";
+            return -1;
+        }
     }
-  }
-  else
-    outfile = stdout;
+    else
+        outfile = stdout;
 
-  samplecount = 0;
+    samplecount = 0;
 
-  return 0;
+    return 0;
 }
 
 static
 int config(struct audio_config *config)
 {
-  /* force 16-bit 44100 Hz stereo */
+    /* force 16-bit 44100 Hz stereo */
 
-  config->channels  = 2;
-  config->speed     = 44100;
-  config->precision = 16;
+    config->channels  = 2;
+    config->speed     = 44100;
+    config->precision = 16;
 
-  return 0;
+    return 0;
 }
 
 static
 int output(unsigned char const *data, unsigned int nsamples)
 {
-  unsigned int count;
-  int result = 0;
+    unsigned int count;
+    int result = 0;
 
-  count = fwrite(data, 2 * 2, nsamples, outfile);
+    count = fwrite(data, 2 * 2, nsamples, outfile);
 
-  if (count != nsamples) {
-    audio_error = ":fwrite";
-    result = -1;
-  }
+    if (count != nsamples) {
+        audio_error = ":fwrite";
+        result = -1;
+    }
 
-  samplecount = (samplecount + count) % CD_FRAMESZ;
+    samplecount = (samplecount + count) % CD_FRAMESZ;
 
-  return result;
+    return result;
 }
 
 static
 int play(struct audio_play *play)
 {
-  unsigned char data[MAX_NSAMPLES * 2 * 2];
+    unsigned char data[MAX_NSAMPLES * 2 * 2];
 
-  assert(play->samples[1]);
+    assert(play->samples[1]);
 
-  audio_pcm_s16be(data, play->nsamples, play->samples[0], play->samples[1],
-		  play->mode, play->stats);
+    audio_pcm_s16be(data, play->nsamples, play->samples[0], play->samples[1],
+            play->mode, play->stats);
 
-  return output(data, play->nsamples);
+    return output(data, play->nsamples);
 }
 
 static
 int stop(struct audio_stop *stop)
 {
-  return 0;
+    return 0;
 }
 
 static
 int finish(struct audio_finish *finish)
 {
-  int result = 0;
+    int result = 0;
 
-  /* pad audio to CD frame boundary */
+    /* pad audio to CD frame boundary */
 
-  if (samplecount) {
-    unsigned char padding[CD_FRAMESZ * 2 * 2];
-    unsigned int padsz;
+    if (samplecount) {
+        unsigned char padding[CD_FRAMESZ * 2 * 2];
+        unsigned int padsz;
 
-    assert(samplecount < CD_FRAMESZ);
-    padsz = CD_FRAMESZ - samplecount;
+        assert(samplecount < CD_FRAMESZ);
+        padsz = CD_FRAMESZ - samplecount;
 
-    memset(padding, 0, padsz * 2 * 2);
+        memset(padding, 0, padsz * 2 * 2);
 
-    result = output(padding, padsz);
-  }
+        result = output(padding, padsz);
+    }
 
-  if (outfile != stdout &&
-      fclose(outfile) == EOF &&
-      result == 0) {
-    audio_error = ":fclose";
-    result = -1;
-  }
+    if (outfile != stdout &&
+            fclose(outfile) == EOF &&
+            result == 0) {
+        audio_error = ":fclose";
+        result = -1;
+    }
 
-  return result;
+    return result;
 }
 
 int audio_cdda(union audio_control *control)
 {
-  audio_error = 0;
+    audio_error = 0;
 
-  switch (control->command) {
-  case AUDIO_COMMAND_INIT:
-    return init(&control->init);
+    switch (control->command) {
+        case AUDIO_COMMAND_INIT:
+            return init(&control->init);
 
-  case AUDIO_COMMAND_CONFIG:
-    return config(&control->config);
+        case AUDIO_COMMAND_CONFIG:
+            return config(&control->config);
 
-  case AUDIO_COMMAND_PLAY:
-    return play(&control->play);
+        case AUDIO_COMMAND_PLAY:
+            return play(&control->play);
 
-  case AUDIO_COMMAND_STOP:
-    return stop(&control->stop);
+        case AUDIO_COMMAND_STOP:
+            return stop(&control->stop);
 
-  case AUDIO_COMMAND_FINISH:
-    return finish(&control->finish);
-  }
+        case AUDIO_COMMAND_FINISH:
+            return finish(&control->finish);
+    }
 
-  return 0;
+    return 0;
 }

@@ -27,30 +27,30 @@
 # define RGAIN_REFERENCE  83		/* reference level (dB SPL) */
 
 enum rgain_name {
-  RGAIN_NAME_NOT_SET    = 0x0,
-  RGAIN_NAME_RADIO      = 0x1,
-  RGAIN_NAME_AUDIOPHILE = 0x2
+    RGAIN_NAME_NOT_SET    = 0x0,
+    RGAIN_NAME_RADIO      = 0x1,
+    RGAIN_NAME_AUDIOPHILE = 0x2
 };
 
 enum rgain_originator {
-  RGAIN_ORIGINATOR_UNSPECIFIED = 0x0,
-  RGAIN_ORIGINATOR_PRESET      = 0x1,
-  RGAIN_ORIGINATOR_USER        = 0x2,
-  RGAIN_ORIGINATOR_AUTOMATIC   = 0x3
+    RGAIN_ORIGINATOR_UNSPECIFIED = 0x0,
+    RGAIN_ORIGINATOR_PRESET      = 0x1,
+    RGAIN_ORIGINATOR_USER        = 0x2,
+    RGAIN_ORIGINATOR_AUTOMATIC   = 0x3
 };
 
 struct rgain {
-  enum rgain_name name;			/* profile (see above) */
-  enum rgain_originator originator;	/* source (see above) */
-  signed short adjustment;		/* in units of 0.1 dB */
+    enum rgain_name name;			/* profile (see above) */
+    enum rgain_originator originator;	/* source (see above) */
+    signed short adjustment;		/* in units of 0.1 dB */
 };
 
 # define RGAIN_SET(rgain)	((rgain)->name != RGAIN_NAME_NOT_SET)
 
 # define RGAIN_VALID(rgain)  \
-  (((rgain)->name == RGAIN_NAME_RADIO ||  \
-    (rgain)->name == RGAIN_NAME_AUDIOPHILE) &&  \
-   (rgain)->originator != RGAIN_ORIGINATOR_UNSPECIFIED)
+    (((rgain)->name == RGAIN_NAME_RADIO ||  \
+      (rgain)->name == RGAIN_NAME_AUDIOPHILE) &&  \
+     (rgain)->originator != RGAIN_ORIGINATOR_UNSPECIFIED)
 
 # define RGAIN_DB(rgain)  ((rgain)->adjustment / 10.0)
 

@@ -38,123 +38,123 @@ static char format_str[7];
 static
 int init(struct audio_init *init)
 {
-  if (init->path && strcmp(init->path, "-") != 0) {
-    outfile = fopen(init->path, "w");
-    if (outfile == 0) {
-      audio_error = ":";
-      return -1;
+    if (init->path && strcmp(init->path, "-") != 0) {
+        outfile = fopen(init->path, "w");
+        if (outfile == 0) {
+            audio_error = ":";
+            return -1;
+        }
     }
-  }
-  else
-    outfile = stdout;
+    else
+        outfile = stdout;
 
-  return 0;
+    return 0;
 }
 
 static
 int config(struct audio_config *config)
 {
-  bitdepth = config->precision & ~3;
-  if (bitdepth == 0 || bitdepth > 24)
-    bitdepth = 24;
+    bitdepth = config->precision & ~3;
+    if (bitdepth == 0 || bitdepth > 24)
+        bitdepth = 24;
 
-  config->precision = bitdepth;
+    config->precision = bitdepth;
 
-  sprintf(format_str, "%%0%1ulX\n", bitdepth / 4);
+    sprintf(format_str, "%%0%1ulX\n", bitdepth / 4);
 
-  fprintf(outfile, "# %u channel%s, %u Hz, %u-bit samples\n",
-	  config->channels, config->channels == 1 ? "" : "s",
-	  config->speed, config->precision);
+    fprintf(outfile, "# %u channel%s, %u Hz, %u-bit samples\n",
+            config->channels, config->channels == 1 ? "" : "s",
+            config->speed, config->precision);
 
-  return 0;
+    return 0;
 }
 
 static
 int play(struct audio_play *play)
 {
-  unsigned int len;
-  mad_fixed_t const *left, *right;
-  unsigned long mask;
+    unsigned int len;
+    mad_fixed_t const *left, *right;
+    unsigned long mask;
 
-  len   = play->nsamples;
-  left  = play->samples[0];
-  right = play->samples[1];
+    len   = play->nsamples;
+    left  = play->samples[0];
+    right = play->samples[1];
 
-  mask = (1L << bitdepth) - 1;
+    mask = (1L << bitdepth) - 1;
 
-  switch (play->mode) {
-  case AUDIO_MODE_ROUND:
-    while (len--) {
-      fprintf(outfile, format_str,
-	      audio_linear_round(bitdepth, *left++, play->stats) & mask);
+    switch (play->mode) {
+        case AUDIO_MODE_ROUND:
+            while (len--) {
+                fprintf(outfile, format_str,
+                        audio_linear_round(bitdepth, *left++, play->stats) & mask);
 
-      if (right) {
-	fprintf(outfile, format_str,
-		audio_linear_round(bitdepth, *right++, play->stats) & mask);
-      }
+                if (right) {
+                    fprintf(outfile, format_str,
+                            audio_linear_round(bitdepth, *right++, play->stats) & mask);
+                }
+            }
+            break;
+
+        case AUDIO_MODE_DITHER:
+            {
+                static struct audio_dither left_dither, right_dither;
+
+                while (len--) {
+                    fprintf(outfile, format_str,
+                            audio_linear_dither(bitdepth, *left++, &left_dither,
+                                play->stats) & mask);
+
+                    if (right) {
+                        fprintf(outfile, format_str,
+                                audio_linear_dither(bitdepth, *right++, &right_dither,
+                                    play->stats) & mask);
+                    }
+                }
+            }
+            break;
     }
-    break;
 
-  case AUDIO_MODE_DITHER:
-    {
-      static struct audio_dither left_dither, right_dither;
-
-      while (len--) {
-	fprintf(outfile, format_str,
-		audio_linear_dither(bitdepth, *left++, &left_dither,
-				    play->stats) & mask);
-
-	if (right) {
-	  fprintf(outfile, format_str,
-		  audio_linear_dither(bitdepth, *right++, &right_dither,
-				      play->stats) & mask);
-	}
-      }
-    }
-    break;
-  }
-
-  return 0;
+    return 0;
 }
 
 static
 int stop(struct audio_stop *stop)
 {
-  return 0;
+    return 0;
 }
 
 static
 int finish(struct audio_finish *finish)
 {
-  if (outfile != stdout &&
-      fclose(outfile) == EOF) {
-    audio_error = ":fclose";
-    return -1;
-  }
+    if (outfile != stdout &&
+            fclose(outfile) == EOF) {
+        audio_error = ":fclose";
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }
 
 int audio_hex(union audio_control *control)
 {
-  audio_error = 0;
+    audio_error = 0;
 
-  switch (control->command) {
-  case AUDIO_COMMAND_INIT:
-    return init(&control->init);
+    switch (control->command) {
+        case AUDIO_COMMAND_INIT:
+            return init(&control->init);
 
-  case AUDIO_COMMAND_CONFIG:
-    return config(&control->config);
+        case AUDIO_COMMAND_CONFIG:
+            return config(&control->config);
 
-  case AUDIO_COMMAND_PLAY:
-    return play(&control->play);
+        case AUDIO_COMMAND_PLAY:
+            return play(&control->play);
 
-  case AUDIO_COMMAND_STOP:
-    return stop(&control->stop);
+        case AUDIO_COMMAND_STOP:
+            return stop(&control->stop);
 
-  case AUDIO_COMMAND_FINISH:
-    return finish(&control->finish);
-  }
+        case AUDIO_COMMAND_FINISH:
+            return finish(&control->finish);
+    }
 
-  return 0;
+    return 0;
 }
